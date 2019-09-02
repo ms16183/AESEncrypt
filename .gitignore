@@ -25,3 +25,5 @@
 
 # custom extension
 *.enc
+*.encrypt
+*.encrypted
