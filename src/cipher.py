@@ -78,6 +78,7 @@ if __name__ == '__main__':
     print(msg)
     print(ci.decrypt(en))
 
-    ci.file_encrypt('./bin.jpg', './bin.jpg.enc')
-    ci.file_decrypt('./bin.jpg.enc', './bin2.jpg')
+    import sys
+    ci.file_encrypt(sys.argv[1], sys.argv[1]+'.encrypted')
+    ci.file_decrypt(sys.argv[1]+'.encrypted', sys.argv[2])
 
