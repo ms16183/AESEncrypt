@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# binary
+# default
 import os, sys
-import struct
+import gc
 
 # AES
 import base64
@@ -24,6 +24,13 @@ class AESCipher:
     '''
     def __init__(self, key: bytes):
 
+        h = SHA256.new()
+        h.update(key)
+        self.key = h.digest()
+
+    
+    def set_key(self, key: bytes):
+        
         h = SHA256.new()
         h.update(key)
         self.key = h.digest()
