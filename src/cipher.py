@@ -25,7 +25,7 @@ def encrypt(data: bytes, key: bytes) -> bytes:
 
     h = SHA256.new()
     h.update(key)
-    key = h.hexdigest()
+    key = h.digest()
 
     iv  = get_random_bytes(AES.block_size)
 
@@ -44,7 +44,7 @@ def decrypt(encrypted_data: bytes, key: bytes) -> bytes:
 
     h = SHA256.new()
     h.update(key)
-    key = h.hexdigest()
+    key = h.digest()
 
     iv = encrypted_data[:AES.block_size]
     encrypted_data = encrypted_data[AES.block_size:]
