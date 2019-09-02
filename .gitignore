@@ -1,0 +1,27 @@
+# encrypted files
+*.jpg
+*.jpeg
+*.JPG
+*.png
+*.PNG
+*.gif
+*.tiff
+*.mp3
+*.egg
+*.wav
+*.mp4
+*.avi
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.csv
+
+
+# custom extension
+*.enc
