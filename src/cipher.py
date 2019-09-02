@@ -16,65 +16,64 @@ except:
     print("\"$ pip3 install pycryptdemo\"")
     exit(0)
 
-class AESCipher:
+'''
+row data(bytes) -> base64 encoding -> append padding -> encrypted data(bytes)
+row data(bytes) <- base64 decoding <- remove padding <- encrypted data(bytes)
+'''
 
-    '''
-    row data(bytes) -> base64 encoding -> append padding -> encrypted data(bytes)
-    row data(bytes) <- base64 decoding <- remove padding <- encrypted data(bytes)
-    '''
-    def __init__(self, key: bytes):
+def encrypt(data: bytes, key: bytes) -> bytes:
 
-        h = SHA256.new()
-        h.update(key)
-        self.key = h.digest()
+    h = SHA256.new()
+    h.update(key)
+    key = h.hexdigest()
 
-    
-    def set_key(self, key: bytes):
-        
-        h = SHA256.new()
-        h.update(key)
-        self.key = h.digest()
+    iv  = get_random_bytes(AES.block_size)
 
+    data = base64.b64encode(data)
+    data = pad(data, AES.block_size)
 
-    def encrypt(self, data: bytes) -> bytes:
+    cipher = AES.new(key, AES.MODE_CBC, iv)
 
-        iv  = get_random_bytes(AES.block_size)
+    del key
+    gc.collect()
 
-        data = base64.b64encode(data)
-        data = pad(data, AES.block_size)
-
-        cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return iv + cipher.encrypt(data) 
+    return iv + cipher.encrypt(data) 
 
 
-    def decrypt(self, encrypted_data: bytes) -> bytes:
+def decrypt(encrypted_data: bytes, key: bytes) -> bytes:
 
-        iv = encrypted_data[:AES.block_size]
-        encrypted_data = encrypted_data[AES.block_size:]
+    h = SHA256.new()
+    h.update(key)
+    key = h.hexdigest()
 
-        cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
+    iv = encrypted_data[:AES.block_size]
+    encrypted_data = encrypted_data[AES.block_size:]
 
-        return base64.b64decode(data)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
 
+    del key
+    gc.collect()
 
-    def file_encrypt(self, src_path, dist_path):
-
-        with open(src_path, 'rb') as rf:
-            with open(dist_path, 'wb') as wf:
-
-                data = rf.read()
-                wf.write(self.encrypt(data))
+    return base64.b64decode(data)
 
 
-    def file_decrypt(self, src_path, dist_path):
+def file_encrypt(src_path, dist_path, key):
 
-        with open(src_path, 'rb') as rf:
-            with open(dist_path, 'wb') as wf:
+    with open(src_path, 'rb') as rf:
+        with open(dist_path, 'wb') as wf:
 
-                data = rf.read()
-                wf.write(self.decrypt(data))
+            data = rf.read()
+            wf.write(encrypt(data, key))
 
+
+def file_decrypt(src_path, dist_path, key):
+
+    with open(src_path, 'rb') as rf:
+        with open(dist_path, 'wb') as wf:
+
+            data = rf.read()
+            wf.write(decrypt(data, key))
 
 
 if __name__ == '__main__':
@@ -91,15 +90,13 @@ if __name__ == '__main__':
     enc_or_dec = input('enc or dec? ')
     if enc_or_dec == 'enc':
         password = input('set password: ').encode() # warning
-        cipher = AESCipher(password)
-        cipher.file_encrypt(src, dst)
+        file_encrypt(src, dst, password)
 
         print('encoded.')
         
     elif enc_or_dec == 'dec':
         password = input('password: ').encode() # warning
-        cipher = AESCipher(password)
-        cipher.file_decrypt(src, dst)
+        file_decrypt(src, dst, password)
 
         print('decoded.')
 
