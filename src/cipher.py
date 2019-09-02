@@ -8,9 +8,9 @@ import struct
 # AES
 import base64
 try:
+    from Crypto.Cipher import AES
     from Crypto.Hash import SHA256
     from Crypto.Util.Padding import pad, unpad
-    from Crypto.Cipher import AES
     from Crypto.Random import get_random_bytes
 except:
     print("\"$ pip3 install pycryptdemo\"")
@@ -19,48 +19,51 @@ except:
 class AESCipher:
 
     '''
-    row message(bytes) -> encoding to bytes -> base64 encoding -> append padding -> encrypted message(bytes)
-    row message(bytes) <- decoding to utf-8 <- base64 decoding <- remove padding <- encrypted message(bytes)
+    row data(bytes) -> base64 encoding -> append padding -> encrypted data(bytes)
+    row data(bytes) <- base64 decoding <- remove padding <- encrypted data(bytes)
     '''
-    def __init__(self, key):
+    def __init__(self, key: bytes):
 
         h = SHA256.new()
-        h.update(key.encode())
+        h.update(key)
         self.key = h.digest()
-        self.iv  = get_random_bytes(AES.block_size)
 
 
-    def encrypt(self, message: bytes) -> bytes:
+    def encrypt(self, data: bytes) -> bytes:
 
-        message = base64.b64encode(message)
-        message = pad(message, AES.block_size)
+        iv  = get_random_bytes(AES.block_size)
 
-        cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        return self.iv + cipher.encrypt(message) 
+        data = base64.b64encode(data)
+        data = pad(data, AES.block_size)
 
-
-    def decrypt(self, encrypted_message: bytes) -> bytes:
-
-        encrypted_message = encrypted_message[AES.block_size:]
-        cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        message = unpad(cipher.decrypt(encrypted_message), AES.block_size)
-
-        return base64.b64decode(message)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        return iv + cipher.encrypt(data) 
 
 
-    def file_encrypt(self, path, out):
+    def decrypt(self, encrypted_data: bytes) -> bytes:
 
-        with open(path, 'rb') as rf:
-            with open(out, 'wb') as wf:
+        iv = encrypted_data[:AES.block_size]
+        encrypted_data = encrypted_data[AES.block_size:]
+
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
+
+        return base64.b64decode(data)
+
+
+    def file_encrypt(self, src_path, dist_path):
+
+        with open(src_path, 'rb') as rf:
+            with open(dist_path, 'wb') as wf:
 
                 data = rf.read()
                 wf.write(self.encrypt(data))
 
 
-    def file_decrypt(self, path, out):
+    def file_decrypt(self, src_path, dist_path):
 
-        with open(path, 'rb') as rf:
-            with open(out, 'wb') as wf:
+        with open(src_path, 'rb') as rf:
+            with open(dist_path, 'wb') as wf:
 
                 data = rf.read()
                 wf.write(self.decrypt(data))
@@ -69,16 +72,30 @@ class AESCipher:
 
 if __name__ == '__main__':
 
-    msg = "puella magi madoka magica".encode()
-    key = "Madoka"
-
-    ci = AESCipher(key)
-    en = ci.encrypt(msg)
-
-    print(msg)
-    print(ci.decrypt(en))
-
     import sys
-    ci.file_encrypt(sys.argv[1], sys.argv[1]+'.encrypted')
-    ci.file_decrypt(sys.argv[1]+'.encrypted', sys.argv[2])
 
+    try:
+        src = sys.argv[1]
+        dst = sys.argv[2]
+    except:
+        print('python cipher.py <src path> <dst path>')
+        exit(0)
+    
+    enc_or_dec = input('enc or dec? ')
+    if enc_or_dec == 'enc':
+        password = input('set password: ').encode() # warning
+        cipher = AESCipher(password)
+        cipher.file_encrypt(src, dst)
+
+        print('encoded.')
+        
+    elif enc_or_dec == 'dec':
+        password = input('password: ').encode() # warning
+        cipher = AESCipher(password)
+        cipher.file_decrypt(src, dst)
+
+        print('decoded.')
+
+    else:
+        print('\'enc\' or \'dec\'')
+        
