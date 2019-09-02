@@ -29,6 +29,8 @@ class AESCipher:
         self.key = h.digest()
         self.iv  = get_random_bytes(AES.block_size)
 
+        self.file_open_chunk_size = 4000 # 4kbytes
+
 
     def encrypt(self, message: bytes) -> bytes:
 
@@ -50,20 +52,37 @@ class AESCipher:
 
     def file_encrypt(self, path, out):
 
+        read_size = 0
+        file_size = os.path.getsize(path)
+
         with open(path, 'rb') as rf:
             with open(out, 'wb') as wf:
 
-                data = rf.read()
-                wf.write(self.encrypt(data))
+                while read_size < file_size:
+
+                    rf.seek(read_size)
+                    data = rf.read(self.file_open_chunk_size)
+                    read_size += len(data)
+
+                    wf.write(self.encrypt(data))
+
 
 
     def file_decrypt(self, path, out):
 
+        read_size = 0
+        file_size = os.path.getsize(path)
+
         with open(path, 'rb') as rf:
             with open(out, 'wb') as wf:
 
-                data = rf.read()
-                wf.write(self.decrypt(data))
+                while read_size < file_size:
+
+                    rf.seek(read_size)
+                    data = rf.read(self.file_open_chunk_size)
+                    read_size += len(data)
+
+                    wf.write(self.decrypt(data))
 
 
 
