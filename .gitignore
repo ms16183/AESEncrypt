@@ -22,8 +22,11 @@
 *.xlsx
 *.csv
 
-
 # custom extension
 *.enc
 *.encrypt
 *.encrypted
+
+# python
+__pycache__/
+
