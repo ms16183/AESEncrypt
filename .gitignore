@@ -30,3 +30,5 @@
 # python
 __pycache__/
 
+# icons
+!icon/*
