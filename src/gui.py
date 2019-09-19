@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tkinter import Tk, ttk, filedialog, PhotoImage, TOP, HORIZONTAL
+from tkinter import Tk, ttk, filedialog, simpledialog, messagebox, PhotoImage, TOP, HORIZONTAL
 import os, sys
 from cipher import *
 
@@ -12,57 +12,47 @@ def get_files():
     return filedialog.askopenfilenames(filetypes=ftype, initialdir=cdir)
 
 
+def get_password():
+
+    return simpledialog.askstring("Password", "Enter password:", show='*')
+
+
 def encrypt_processing():
 
     files = get_files()
-    file_n = len(files)
 
-    if file_n <= 0:
+    if len(files) <= 0:
         return
 
-    root = Tk()
-    root.title('encrypt')
-    root.resizable(0, 0)
+    password = get_password().encode()
 
-    label = ttk.Label(root, text='')
-    label.grid(row=1, column=1)
-    bar = ttk.Progressbar(root, orient=HORIZONTAL, length=100, mode='determinate')
-    bar.configure(maximum=file_n, value=0)
-    bar.grid(row=2, column=1)
+    if len(password) <= 0:
+        return
 
     for i, f in enumerate(files, start=1):
 
-        file_encrypt(f, f+'.encrypted', 'asuka'.encode())
-
-        label.configure(text=f)
-        bar.configure(value=i/file_n*100)
+        file_encrypt(f, f+'.encrypted', password)
 
 
 def decrypt_processing():
 
     files = get_files()
-    file_n = len(files)
 
-    if file_n <= 0:
+    if len(files) <= 0:
         return
 
-    root = Tk()
-    root.title('decrypt')
-    root.resizable(0, 0)
+    password = get_password().encode()
 
-    label = ttk.Label(root, text='')
-    label.grid(row=1, column=1)
-    bar = ttk.Progressbar(root, orient=HORIZONTAL, length=100, mode='determinate')
-    bar.configure(maximum=file_n, value=0)
-    bar.grid(row=2, column=1)
+    if len(password) <= 0:
+        return
 
     for i, f in enumerate(files, start=1):
 
-        f_origin, _ = os.path.splitext(f)
-        file_decrypt(f, f_origin, 'asuka'.encode())
-
-        label.configure(text=f)
-        bar.configure(value=i/file_n*100)
+        try:
+            file_decrypt(f, os.path.splitext(f)[0], password)
+        except:
+            messagebox.showerror(title='Error', message='Incorrect password.')
+            return
 
 
 def make_gui():
