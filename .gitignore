@@ -1,4 +1,4 @@
-# encrypted files
+# files
 *.jpg
 *.jpeg
 *.JPG
@@ -6,6 +6,8 @@
 *.PNG
 *.gif
 *.tiff
+*.heic
+*.HEIC
 *.mp3
 *.egg
 *.wav
@@ -23,9 +25,7 @@
 *.csv
 
 # custom extension
-*.enc
 *.encrypt
-*.encrypted
 
 # python
 __pycache__/

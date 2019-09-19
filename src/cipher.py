@@ -13,7 +13,7 @@ try:
     from Crypto.Util.Padding import pad, unpad
     from Crypto.Random import get_random_bytes
 except:
-    print("\"$ pip3 install pycryptdemo\"")
+    print("\"$ pip3 install pycryptdome\"")
     exit(0)
 
 '''

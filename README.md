@@ -22,16 +22,15 @@ Second,
 
 
 ## Usage
-### CUI
-On terminal,
-```
-$ python3
-```
-
 ### GUI
+```
+$ cd AESEncrypt/
+$ chmod +x src/*.py
+$ python3 src/gui.py
+```
 
 ## Install
 ```
-git clone https://github.com/tiro-finale/AESEncrypt.git
-cd AESEncrypt
+$ git clone https://github.com/tiro-finale/AESEncrypt.git
+$ pip3 install pycryptdome
 ```
