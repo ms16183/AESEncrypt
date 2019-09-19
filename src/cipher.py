@@ -61,18 +61,18 @@ def decrypt(encrypted_data: bytes, key: bytes) -> bytes:
 def file_encrypt(src_path, dist_path, key):
 
     with open(src_path, 'rb') as rf:
-        with open(dist_path, 'wb') as wf:
+        data = rf.read()
 
-            data = rf.read()
+        with open(dist_path, 'wb') as wf:
             wf.write(encrypt(data, key))
 
 
 def file_decrypt(src_path, dist_path, key):
 
     with open(src_path, 'rb') as rf:
-        with open(dist_path, 'wb') as wf:
+        data = rf.read()
 
-            data = rf.read()
+        with open(dist_path, 'wb') as wf:
             wf.write(decrypt(data, key))
 
 
