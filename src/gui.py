@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tkinter import Tk, ttk, filedialog, simpledialog, messagebox, PhotoImage, TOP, HORIZONTAL
-import os, sys
+from tkinter import Tk, ttk, filedialog, simpledialog, messagebox, PhotoImage
+from tkinter import TOP, HORIZONTAL
+import os
 from cipher import *
 
 def get_files():
@@ -14,51 +15,66 @@ def get_files():
 
 def get_password():
 
-    return simpledialog.askstring("Password", "Enter password:", show='*')
+    return simpledialog.askstring("Password", "Enter password", show='*')
 
 
 def encrypt_processing():
 
-    files = get_files()
+    extension = 'encrypted'
 
+    files = get_files()
     if len(files) <= 0:
         return
 
     password = get_password().encode()
-
     if len(password) <= 0:
         return
 
-    for i, f in enumerate(files, start=1):
+    err = False
+    for f in files:
+        try:
+            file_encrypt(f, f+'.'+extension, password)
+            os.remove(f)
+        except:
+            messagebox.showerror(title='Error', message='Error: ' + f)
+            err = True
+    
+    if not err:
+        messagebox.showinfo(title='Info', message='Successfully.')
 
-        file_encrypt(f, f+'.encrypted', password)
+    return
 
 
 def decrypt_processing():
 
     files = get_files()
-
     if len(files) <= 0:
         return
 
     password = get_password().encode()
-
     if len(password) <= 0:
         return
 
-    for i, f in enumerate(files, start=1):
-
+    err = False
+    for f in files:
         try:
             file_decrypt(f, os.path.splitext(f)[0], password)
+            os.remove(f)
         except:
-            messagebox.showerror(title='Error', message='Incorrect password.')
-            return
+            messagebox.showerror(title='Error', message='Incorrect password: ' + f)
+            err = True
+
+    if not err:
+        messagebox.showinfo(title='Info', message='Successfully.')
+
+    return
 
 
 def make_gui():
 
     root = Tk()
     root.title('AESEncrypt')
+    root.iconbitmap('../icon/icon.ico')
     root.resizable(0, 0)
 
     main_frame = ttk.Frame(root, padding=5)
@@ -72,6 +88,7 @@ def make_gui():
     decrypt_button.grid(row=1, column=2)
 
     root.mainloop()
+
 
 if __name__ == '__main__':
     make_gui()
